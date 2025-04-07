@@ -23,20 +23,18 @@ func TestFindModules(t *testing.T) {
 		moduleDir   string
 	}
 
+	// TODO: parametrize this test
 	testCases := []struct {
 		expectedErr  error
 		repoPath     string
+		extraModules []string
 		expectedData []moduleData
 	}{
 		{
-			repoPath: "testdata/find_modules",
+			repoPath:     "testdata/find_modules",
+			extraModules: []string{},
 			expectedData: []moduleData{
-				{
-					title:       "ALB Ingress Controller Module",
-					description: "This Terraform Module installs and configures the AWS ALB Ingress Controller on an EKS cluster, so that you can configure an ALB using Ingress resources.",
-					url:         "https://github.com/gruntwork-io/terraform-aws-eks/tree/master/modules/eks-alb-ingress-controller",
-					moduleDir:   "modules/eks-alb-ingress-controller",
-				},
+
 				{
 					title:       "ALB Ingress Controller IAM Policy Module",
 					description: "This Terraform Module defines an IAM policy that defines the minimal set of permissions necessary for the AWS ALB Ingress Controller.",
@@ -48,6 +46,29 @@ func TestFindModules(t *testing.T) {
 					description: "This module contains a go CLI, docker container, and terraform module for deploying a Kubernetes controller for managing mappings between AWS IAM roles and users to RBAC groups in Kubernetes.",
 					url:         "https://github.com/gruntwork-io/terraform-aws-eks/tree/master/modules/eks-aws-auth-merger",
 					moduleDir:   "modules/eks-aws-auth-merger",
+				}},
+		},
+		{
+			repoPath:     "testdata/find_modules",
+			extraModules: []string{"eks-alb-ingress-controller"},
+			expectedData: []moduleData{
+				{
+					title:       "ALB Ingress Controller IAM Policy Module",
+					description: "This Terraform Module defines an IAM policy that defines the minimal set of permissions necessary for the AWS ALB Ingress Controller.",
+					url:         "https://github.com/gruntwork-io/terraform-aws-eks/tree/master/modules/eks-alb-ingress-controller-iam-policy",
+					moduleDir:   "modules/eks-alb-ingress-controller-iam-policy",
+				},
+				{
+					title:       "EKS AWS Auth Merger",
+					description: "This module contains a go CLI, docker container, and terraform module for deploying a Kubernetes controller for managing mappings between AWS IAM roles and users to RBAC groups in Kubernetes.",
+					url:         "https://github.com/gruntwork-io/terraform-aws-eks/tree/master/modules/eks-aws-auth-merger",
+					moduleDir:   "modules/eks-aws-auth-merger",
+				},
+				{
+					title:       "ALB Ingress Controller Module",
+					description: "This Terraform Module installs and configures the AWS ALB Ingress Controller on an EKS cluster, so that you can configure an ALB using Ingress resources.",
+					url:         "https://github.com/gruntwork-io/terraform-aws-eks/tree/master/eks-alb-ingress-controller",
+					moduleDir:   "eks-alb-ingress-controller",
 				}},
 		},
 	}
@@ -64,7 +85,7 @@ func TestFindModules(t *testing.T) {
 			repo, err := module.NewRepo(ctx, log.New(), tc.repoPath, "", false, false)
 			require.NoError(t, err)
 
-			modules, err := repo.FindModules(ctx)
+			modules, err := repo.FindModules(ctx, tc.extraModules)
 			assert.Equal(t, tc.expectedErr, err)
 
 			var realData []moduleData
