@@ -11,13 +11,22 @@ import (
 
 const (
 	CommandName = "catalog"
+
+	ModuleDirsFlagName = "module-dirs"
 )
 
 func NewFlags(opts *options.TerragruntOptions, prefix flags.Prefix) cli.Flags {
-	return scaffold.NewFlags(opts, prefix).Filter(
+	flags := scaffold.NewFlags(opts, prefix).Filter(
 		scaffold.RootFileNameFlagName,
 		scaffold.NoIncludeRootFlagName,
 	)
+	moduleDirsFlag := flags.NewFlag(&cli.SliceFlag[string]{
+		Name:        ModuleDirsFlagName,
+		EnvVars:     tgPrefix.EnvVars(ModuleDirsFlagName),
+		Destination: &opts.ModuleDirsFlagName,
+		Usage:       "Directories to be searched in recursively when looking for modules.",
+	})
+	return flags.Add(moduleDirsFlag)
 }
 
 func NewCommand(opts *options.TerragruntOptions) *cli.Command {

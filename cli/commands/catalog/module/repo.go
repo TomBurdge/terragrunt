@@ -78,7 +78,7 @@ func NewRepo(ctx context.Context, l log.Logger, cloneURL, path string, walkWithS
 }
 
 // FindModules clones the repository if `repoPath` is a URL, searches for Terragrunt modules, indexes their README.* files, and returns module instances.
-func (repo *Repo) FindModules(ctx context.Context) (Modules, error) {
+func (repo *Repo) FindModules(ctx context.Context, moduleDirs []string) (Modules, error) {
 	var modules Modules
 
 	// check if root repo path is a module dir
@@ -87,6 +87,10 @@ func (repo *Repo) FindModules(ctx context.Context) (Modules, error) {
 	} else if module != nil {
 		modules = append(modules, module)
 	}
+
+	// TODO: get the right arg
+	// it's not opts right now - not passed to the arg
+	modulesPaths := append(modulesPaths, moduleDirs...)
 
 	for _, modulesPath := range modulesPaths {
 		modulesPath = filepath.Join(repo.path, modulesPath)

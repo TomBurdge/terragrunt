@@ -48,7 +48,7 @@ func Run(ctx context.Context, opts *options.TerragruntOptions, repoURL string) e
 			return err
 		}
 
-		repoModules, err := repo.FindModules(ctx)
+		repoModules, err := repo.FindModules(ctx, opts.ModuleDirsFlagName)
 		if err != nil {
 			return err
 		}
